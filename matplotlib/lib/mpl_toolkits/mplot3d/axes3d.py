@@ -29,6 +29,7 @@ import matplotlib.scale as mscale
 from matplotlib.tri.triangulation import Triangulation
 import numpy as np
 from matplotlib.colors import Normalize, colorConverter, LightSource
+from matplotlib.container import ErrorbarContainer
 
 from . import art3d
 from . import proj3d
@@ -2394,7 +2395,359 @@ class Axes3D(Axes):
         self.add_collection(col)
 
         self.auto_scale_xyz((minx, maxx), (miny, maxy), (minz, maxz), had_data)
+    
+    def errorbar2(self, x, y, z, zerr=None,
+                 **kwargs):
+        return Axes.errorbar(self, x, y, **kwargs)
+    
+    def errorbar(self, x, y, z, zerr=None, yerr=None, xerr=None,
+                 fmt='-', ecolor=None, elinewidth=None, capsize=3,
+                 barsabove=False, lolims=False, uplims=False,
+                 xlolims=False, xuplims=False, errorevery=1, capthick=None,
+                 **kwargs):
+        """
+        Plot an errorbar graph.
 
+        Call signature::
+
+          errorbar(x, y, yerr=None, xerr=None,
+                   fmt='-', ecolor=None, elinewidth=None, capsize=3,
+                   barsabove=False, lolims=False, uplims=False,
+                   xlolims=False, xuplims=False, errorevery=1,
+                   capthick=None)
+
+        Plot *x* versus *y* with error deltas in *yerr* and *xerr*.
+        Vertical errorbars are plotted if *yerr* is not *None*.
+        Horizontal errorbars are plotted if *xerr* is not *None*.
+
+        *x*, *y*, *xerr*, and *yerr* can all be scalars, which plots a
+        single error bar at *x*, *y*.
+
+        Optional keyword arguments:
+
+          *xerr*/*yerr*: [ scalar | N, Nx1, or 2xN array-like ]
+            If a scalar number, len(N) array-like object, or an Nx1
+            array-like object, errorbars are drawn at +/-value relative
+            to the data.
+
+            If a sequence of shape 2xN, errorbars are drawn at -row1
+            and +row2 relative to the data.
+
+          *fmt*: '-'
+            The plot format symbol. If *fmt* is *None*, only the
+            errorbars are plotted.  This is used for adding
+            errorbars to a bar plot, for example.
+
+          *ecolor*: [ *None* | mpl color ]
+            A matplotlib color arg which gives the color the errorbar lines;
+            if *None*, use the marker color.
+
+          *elinewidth*: scalar
+            The linewidth of the errorbar lines. If *None*, use the linewidth.
+
+          *capsize*: scalar
+            The length of the error bar caps in points
+
+          *capthick*: scalar
+            An alias kwarg to *markeredgewidth* (a.k.a. - *mew*). This
+            setting is a more sensible name for the property that
+            controls the thickness of the error bar cap in points. For
+            backwards compatibility, if *mew* or *markeredgewidth* are given,
+            then they will over-ride *capthick*.  This may change in future
+            releases.
+
+          *barsabove*: [ *True* | *False* ]
+            if *True*, will plot the errorbars above the plot
+            symbols. Default is below.
+
+          *lolims* / *uplims* / *xlolims* / *xuplims*: [ *False* | *True* ]
+            These arguments can be used to indicate that a value gives
+            only upper/lower limits. In that case a caret symbol is
+            used to indicate this. lims-arguments may be of the same
+            type as *xerr* and *yerr*.
+
+          *errorevery*: positive integer
+            subsamples the errorbars. e.g., if everyerror=5, errorbars for
+            every 5-th datapoint will be plotted. The data plot itself still
+            shows all data points.
+
+        All other keyword arguments are passed on to the plot command for the
+        markers. For example, this code makes big red squares with
+        thick green edges::
+
+          x,y,yerr = rand(3,10)
+          errorbar(x, y, yerr, marker='s',
+                   mfc='red', mec='green', ms=20, mew=4)
+
+        where *mfc*, *mec*, *ms* and *mew* are aliases for the longer
+        property names, *markerfacecolor*, *markeredgecolor*, *markersize*
+        and *markeredgewith*.
+
+        valid kwargs for the marker properties are
+
+        %(Line2D)s
+
+        Returns (*plotline*, *caplines*, *barlinecols*):
+
+            *plotline*: :class:`~matplotlib.lines.Line2D` instance
+                *x*, *y* plot markers and/or line
+
+            *caplines*: list of error bar cap
+                :class:`~matplotlib.lines.Line2D` instances
+            *barlinecols*: list of
+                :class:`~matplotlib.collections.LineCollection` instances for
+                the horizontal and vertical error ranges.
+
+        **Example:**
+
+        .. plot:: mpl_examples/statistics/errorbar_demo.py
+
+        """
+        
+        iterable = cbook.iterable
+
+        if errorevery < 1:
+            raise ValueError(
+                'errorevery has to be a strictly positive integer')
+
+        self._process_unit_info(xdata=x, ydata=y, kwargs=kwargs)
+        if not self._hold:
+            self.cla()
+        holdstate = self._hold
+        self._hold = True
+
+        label = kwargs.pop("label", None)
+
+        # make sure all the args are iterable; use lists not arrays to
+        # preserve units
+        if not iterable(x):
+            x = [x]
+        else:
+            # Ensure x is flattened in the case it is an N * 1 arraylike
+            # otherwise vlines will raise an exception
+            x = list(cbook.flatten(x))
+
+        if not iterable(y):
+            y = [y]
+        else:
+            y = list(cbook.flatten(y))
+
+        if xerr is not None:
+            if not iterable(xerr):
+                xerr = [xerr] * len(x)
+            # Ensure xerr is flattened in the case it is an N * 1 arraylike
+            # Do not flatten if it is a 2 * N arraylike
+            elif not(len(xerr) == 2 and iterable(xerr[0])
+                     and iterable(xerr[1])):
+                xerr = list(cbook.flatten(xerr))
+
+        if yerr is not None:
+            if not iterable(yerr):
+                yerr = [yerr] * len(y)
+            elif not (len(yerr) == 2 and iterable(yerr[0])
+                      and iterable(yerr[1])):
+                yerr = list(cbook.flatten(yerr))
+
+        l0 = None
+
+        if barsabove and fmt is not None:
+            l0, = self.plot(x, y, fmt, label="_nolegend_", **kwargs)
+
+        barcols = []
+        caplines = []
+
+        lines_kw = {'label': '_nolegend_'}
+        if elinewidth:
+            lines_kw['linewidth'] = elinewidth
+        else:
+            if 'linewidth' in kwargs:
+                lines_kw['linewidth'] = kwargs['linewidth']
+            if 'lw' in kwargs:
+                lines_kw['lw'] = kwargs['lw']
+        if 'transform' in kwargs:
+            lines_kw['transform'] = kwargs['transform']
+        if 'alpha' in kwargs:
+            lines_kw['alpha'] = kwargs['alpha']
+        if 'zorder' in kwargs:
+            lines_kw['zorder'] = kwargs['zorder']
+
+        # arrays fine here, they are booleans and hence not units
+        if not iterable(lolims):
+            lolims = np.asarray([lolims] * len(x), bool)
+        else:
+            lolims = np.asarray(lolims, bool)
+
+        if not iterable(uplims):
+            uplims = np.array([uplims] * len(x), bool)
+        else:
+            uplims = np.asarray(uplims, bool)
+
+        if not iterable(xlolims):
+            xlolims = np.array([xlolims] * len(x), bool)
+        else:
+            xlolims = np.asarray(xlolims, bool)
+
+        if not iterable(xuplims):
+            xuplims = np.array([xuplims] * len(x), bool)
+        else:
+            xuplims = np.asarray(xuplims, bool)
+
+        everymask = np.arange(len(x)) % errorevery == 0
+
+        def xywhere(xs, ys, mask):
+            """
+            return xs[mask], ys[mask] where mask is True but xs and
+            ys are not arrays
+            """
+            assert len(xs) == len(ys)
+            assert len(xs) == len(mask)
+            xs = [thisx for thisx, b in zip(xs, mask) if b]
+            ys = [thisy for thisy, b in zip(ys, mask) if b]
+            return xs, ys
+
+        if capsize > 0:
+            plot_kw = {
+                'ms': 2 * capsize,
+                'label': '_nolegend_'}
+            if capthick is not None:
+                # 'mew' has higher priority, I believe,
+                # if both 'mew' and 'markeredgewidth' exists.
+                # So, save capthick to markeredgewidth so that
+                # explicitly setting mew or markeredgewidth will
+                # over-write capthick.
+                plot_kw['markeredgewidth'] = capthick
+            # For backwards-compat, allow explicit setting of
+            # 'mew' or 'markeredgewidth' to over-ride capthick.
+            if 'markeredgewidth' in kwargs:
+                plot_kw['markeredgewidth'] = kwargs['markeredgewidth']
+            if 'mew' in kwargs:
+                plot_kw['mew'] = kwargs['mew']
+            if 'transform' in kwargs:
+                plot_kw['transform'] = kwargs['transform']
+            if 'alpha' in kwargs:
+                plot_kw['alpha'] = kwargs['alpha']
+            if 'zorder' in kwargs:
+                plot_kw['zorder'] = kwargs['zorder']
+
+        if xerr is not None:
+            if (iterable(xerr) and len(xerr) == 2 and
+                iterable(xerr[0]) and iterable(xerr[1])):
+                # using list comps rather than arrays to preserve units
+                left = [thisx - thiserr for (thisx, thiserr)
+                        in cbook.safezip(x, xerr[0])]
+                right = [thisx + thiserr for (thisx, thiserr)
+                         in cbook.safezip(x, xerr[1])]
+            else:
+                # using list comps rather than arrays to preserve units
+                left = [thisx - thiserr for (thisx, thiserr)
+                        in cbook.safezip(x, xerr)]
+                right = [thisx + thiserr for (thisx, thiserr)
+                         in cbook.safezip(x, xerr)]
+
+            yo, _ = xywhere(y, right, everymask)
+            lo, ro = xywhere(left, right, everymask)
+            barcols.append(self.hlines(yo, lo, ro, **lines_kw))
+            if capsize > 0:
+                if xlolims.any():
+                    # can't use numpy logical indexing since left and
+                    # y are lists
+                    leftlo, ylo = xywhere(left, y, xlolims & everymask)
+
+                    caplines.extend(
+                        self.plot(leftlo, ylo, ls='None',
+                                  marker=mlines.CARETLEFT, **plot_kw))
+                    xlolims = ~xlolims
+                    leftlo, ylo = xywhere(left, y, xlolims & everymask)
+                    caplines.extend(self.plot(leftlo, ylo, 'k|', **plot_kw))
+                else:
+
+                    leftlo, ylo = xywhere(left, y, everymask)
+                    caplines.extend(self.plot(leftlo, ylo, 'k|', **plot_kw))
+
+                if xuplims.any():
+
+                    rightup, yup = xywhere(right, y, xuplims & everymask)
+                    caplines.extend(
+                        self.plot(rightup, yup, ls='None',
+                                  marker=mlines.CARETRIGHT, **plot_kw))
+                    xuplims = ~xuplims
+                    rightup, yup = xywhere(right, y, xuplims & everymask)
+                    caplines.extend(self.plot(rightup, yup, 'k|', **plot_kw))
+                else:
+                    rightup, yup = xywhere(right, y, everymask)
+                    caplines.extend(self.plot(rightup, yup, 'k|', **plot_kw))
+
+        if yerr is not None:
+            if (iterable(yerr) and len(yerr) == 2 and
+                iterable(yerr[0]) and iterable(yerr[1])):
+                # using list comps rather than arrays to preserve units
+                lower = [thisy - thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr[0])]
+                upper = [thisy + thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr[1])]
+            else:
+                # using list comps rather than arrays to preserve units
+                lower = [thisy - thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr)]
+                upper = [thisy + thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr)]
+
+            xo, _ = xywhere(x, lower, everymask)
+            lo, uo = xywhere(lower, upper, everymask)
+            barcols.append(self.vlines(xo, lo, uo, **lines_kw))
+            if capsize > 0:
+
+                if lolims.any():
+                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(
+                        self.plot(xlo, lowerlo, ls='None',
+                                  marker=mlines.CARETDOWN, **plot_kw))
+                    lolims = ~lolims
+                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(self.plot(xlo, lowerlo, 'k_', **plot_kw))
+                else:
+                    xlo, lowerlo = xywhere(x, lower, everymask)
+                    caplines.extend(self.plot(xlo, lowerlo, 'k_', **plot_kw))
+
+                if uplims.any():
+                    xup, upperup = xywhere(x, upper, uplims & everymask)
+
+                    caplines.extend(
+                        self.plot(xup, upperup, ls='None',
+                                  marker=mlines.CARETUP, **plot_kw))
+                    uplims = ~uplims
+                    xup, upperup = xywhere(x, upper, uplims & everymask)
+                    caplines.extend(self.plot(xup, upperup, 'k_', **plot_kw))
+                else:
+                    xup, upperup = xywhere(x, upper, everymask)
+                    caplines.extend(self.plot(xup, upperup, 'k_', **plot_kw))
+
+        if not barsabove and fmt is not None:
+            l0, = self.plot(x, y, fmt, **kwargs)
+
+        if ecolor is None:
+            if l0 is None:
+                ecolor = six.next(self._get_lines.color_cycle)
+            else:
+                ecolor = l0.get_color()
+
+        for l in barcols:
+            l.set_color(ecolor)
+        for l in caplines:
+            l.set_color(ecolor)
+
+        self.autoscale_view()
+        self._hold = holdstate
+
+        errorbar_container = ErrorbarContainer((l0, tuple(caplines),
+                                                tuple(barcols)),
+                                               has_xerr=(xerr is not None),
+                                               has_yerr=(yerr is not None),
+                                               label=label)
+        self.containers.append(errorbar_container)
+
+        return errorbar_container  # (l0, caplines, barcols)
+    
     def set_title(self, label, fontdict=None, loc='center', **kwargs):
         ret = Axes.set_title(self, label, fontdict=fontdict, loc=loc, **kwargs)
         (x, y) = self.title.get_position()
