@@ -31,6 +31,7 @@ import numpy as np
 from matplotlib.colors import Normalize, colorConverter, LightSource
 from matplotlib.container import ErrorbarContainer
 import matplotlib.lines as mlines
+iterable = cbook.iterable
 
 from . import art3d
 from . import proj3d
@@ -2397,6 +2398,106 @@ class Axes3D(Axes):
 
         self.auto_scale_xyz((minx, maxx), (miny, maxy), (minz, maxz), had_data)
     
+    def zlines(self, x, y, zmin, zmax, colors='k', linestyles='solid',
+               label='', **kwargs):
+        """
+        Plot horizontal lines at each `y` from `zmin` to `zmax`.
+
+        Parameters
+        ----------
+        y : scalar or sequence of scalar
+            y-indexes where to plot the lines.
+
+        zmin, zmax : scalar or 1D array_like
+            Respective beginning and end of each line. If scalars are
+            provided, all lines will have same length.
+
+        colors : array_like of colors, optional, default: 'k'
+
+        linestyles : ['solid' | 'dashed' | 'dashdot' | 'dotted'], optional
+
+        label : string, optional, default: ''
+
+        Returns
+        -------
+        lines : `~matplotlib.collections.LineCollection`
+
+        Other parameters
+        ----------------
+        kwargs :  `~matplotlib.collections.LineCollection` properties.
+
+        See also
+        --------
+        vlines : vertical lines
+
+        Examples
+        --------
+        .. plot:: mpl_examples/pylab_examples/vline_hline_demo.py
+
+        """
+
+        # We do the conversion first since not all unitized data is uniform
+        # process the unit information
+        self._process_unit_info(x, y, [zmin, zmax], kwargs=kwargs)
+        x = self.convert_yunits(x)
+        y = self.convert_yunits(y)
+        zmin = self.convert_zunits(zmin)
+        zmax = self.convert_zunits(zmax)
+
+        if not iterable(x):
+            x = [x]
+        if not iterable(y):
+            y = [y]
+        if not iterable(zmin):
+            zmin = [zmin]
+        if not iterable(zmax):
+            zmax = [zmax]
+
+        x = np.asarray(x)
+        y = np.asarray(y)
+        zmin = np.asarray(zmin)
+        zmax = np.asarray(zmax)
+
+        if len(zmin) == 1:
+            zmin = np.resize(zmin, x.shape)
+        if len(zmax) == 1:
+            zmax = np.resize(zmax, x.shape)
+
+        if len(zmin) != len(x):
+            raise ValueError('zmin and x are unequal sized sequences')
+        if len(zmax) != len(x):
+            raise ValueError('zmax and x are unequal sized sequences')
+
+        verts = [((thisx, thisy, thiszmin), (thisx, thisy, thiszmax))
+                 for thisx, thisy, thiszmin, thiszmax in zip(x, y, zmin, zmax)]
+        coll = art3d.Line3DCollection(verts, colors=colors,
+                                    linestyles=linestyles, label=label)
+        self.add_collection(coll)
+        coll.update(kwargs)
+
+        if len(x) > 0:
+            minx = x.min()
+            maxx = x.max()
+            miny = y.min()
+            maxy = y.max()
+            minz = min(zmin.min(), zmax.min())
+            maxz = max(zmin.max(), zmax.max())
+
+            corners = (minx, miny, minz), (maxx, maxy, maxz)
+
+            self.update_datalim(corners)
+            self.autoscale_view()
+
+        return coll
+    
+#     def zlines(self):
+#         lines = []
+#         lines += [list(zip(xl, yl, zl)) for xl, yl, zl in \
+#                   zip(txlines, tylines, tzlines)]
+# 
+#         linec = art3d.Line3DCollection(lines, *args, **kwargs)
+#         self.add_collection(linec)
+    
     def errorbar2(self, x, y, z, zerr=None,
                  **kwargs):
         return Axes.errorbar(self, x, y, **kwargs)
@@ -2505,7 +2606,7 @@ class Axes3D(Axes):
 
         """
         
-        iterable = cbook.iterable
+        
         had_data = self.has_data()
 
         if errorevery < 1:
@@ -2643,8 +2744,6 @@ class Axes3D(Axes):
             if 'zorder' in kwargs:
                 plot_kw['zorder'] = kwargs['zorder']
                 
-        zo, _ = xywhere(z, x, everymask)
-
         if xerr is not None:
             if (iterable(xerr) and len(xerr) == 2 and
                 iterable(xerr[0]) and iterable(xerr[1])):
@@ -2737,6 +2836,27 @@ class Axes3D(Axes):
                 else:
                     xup, upperup = xywhere(x, upper, everymask)
                     caplines.extend(self.plot(xup, upperup, 'k_', **plot_kw))
+                    
+        if zerr is not None:
+            if (iterable(zerr) and len(zerr) == 2 and
+                iterable(zerr[0]) and iterable(zerr[1])):
+                # using list comps rather than arrays to preserve units
+                lower = [thisz - thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr[0])]
+                upper = [thisz + thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr[1])]
+            else:
+                # using list comps rather than arrays to preserve units
+                lower = [thisz - thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr)]
+                upper = [thisz + thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr)]
+
+            zo, _ = xywhere(z, lower, everymask)
+            lo, uo = xywhere(lower, upper, everymask)
+            barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
+        else:
+            zo, _ = xywhere(z, x, everymask)
 
         if not barsabove and fmt is not None:
             l0, = self.plot(x, y, fmt, **kwargs)
