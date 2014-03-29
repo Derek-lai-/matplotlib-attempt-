@@ -30,6 +30,7 @@ from matplotlib.tri.triangulation import Triangulation
 import numpy as np
 from matplotlib.colors import Normalize, colorConverter, LightSource
 from matplotlib.container import ErrorbarContainer
+import matplotlib.lines as mlines
 
 from . import art3d
 from . import proj3d
@@ -2505,6 +2506,7 @@ class Axes3D(Axes):
         """
         
         iterable = cbook.iterable
+        had_data = self.has_data()
 
         if errorevery < 1:
             raise ValueError(
@@ -2524,13 +2526,18 @@ class Axes3D(Axes):
             x = [x]
         else:
             # Ensure x is flattened in the case it is an N * 1 arraylike
-            # otherwise vlines will raise an exception
+            # otherwise hlines will raise an exception
             x = list(cbook.flatten(x))
 
         if not iterable(y):
             y = [y]
         else:
             y = list(cbook.flatten(y))
+            
+        if not iterable(z):
+            z = [z]
+        else:
+            z = list(cbook.flatten(z))
 
         if xerr is not None:
             if not iterable(xerr):
@@ -2547,6 +2554,13 @@ class Axes3D(Axes):
             elif not (len(yerr) == 2 and iterable(yerr[0])
                       and iterable(yerr[1])):
                 yerr = list(cbook.flatten(yerr))
+                
+        if zerr is not None:
+            if not iterable(zerr):
+                zerr = [zerr] * len(z)
+            elif not (len(zerr) == 2 and iterable(zerr[0])
+                      and iterable(zerr[1])):
+                zerr = list(cbook.flatten(zerr))
 
         l0 = None
 
@@ -2628,6 +2642,8 @@ class Axes3D(Axes):
                 plot_kw['alpha'] = kwargs['alpha']
             if 'zorder' in kwargs:
                 plot_kw['zorder'] = kwargs['zorder']
+                
+        zo, _ = xywhere(z, x, everymask)
 
         if xerr is not None:
             if (iterable(xerr) and len(xerr) == 2 and
@@ -2733,9 +2749,10 @@ class Axes3D(Axes):
 
         for l in barcols:
             l.set_color(ecolor)
+            self.add_collection3d(l, zs=zo)
         for l in caplines:
             l.set_color(ecolor)
-
+            
         self.autoscale_view()
         self._hold = holdstate
 
@@ -2745,6 +2762,8 @@ class Axes3D(Axes):
                                                has_yerr=(yerr is not None),
                                                label=label)
         self.containers.append(errorbar_container)
+        
+        # self.auto_scale_xyz(x, y, z, had_data)
 
         return errorbar_container  # (l0, caplines, barcols)
     
