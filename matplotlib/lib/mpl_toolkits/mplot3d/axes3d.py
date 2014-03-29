@@ -2505,7 +2505,8 @@ class Axes3D(Axes):
     def errorbar(self, x, y, z, zerr=None, yerr=None, xerr=None,
                  fmt='-', ecolor=None, elinewidth=None, capsize=3,
                  barsabove=False, lolims=False, uplims=False,
-                 xlolims=False, xuplims=False, errorevery=1, capthick=None,
+                 xlolims=False, xuplims=False, ylolims=False, yuplims=False, 
+                 errorevery=1, capthick=None,
                  **kwargs):
         """
         Plot an errorbar graph.
@@ -2663,7 +2664,7 @@ class Axes3D(Axes):
         l0 = None
 
         if barsabove and fmt is not None:
-            l0, = self.plot(x, y, fmt, label="_nolegend_", **kwargs)
+            l0, = self.plot(x, y, fmt, label="_nolegend_", zs=z, **kwargs)
 
         barcols = []
         caplines = []
@@ -2703,6 +2704,16 @@ class Axes3D(Axes):
             xuplims = np.array([xuplims] * len(x), bool)
         else:
             xuplims = np.asarray(xuplims, bool)
+            
+        if not iterable(ylolims):
+            ylolims = np.array([ylolims] * len(x), bool)
+        else:
+            ylolims = np.asarray(ylolims, bool)
+
+        if not iterable(yuplims):
+            yuplims = np.array([yuplims] * len(x), bool)
+        else:
+            yuplims = np.asarray(yuplims, bool)
 
         everymask = np.arange(len(x)) % errorevery == 0
 
@@ -2761,6 +2772,33 @@ class Axes3D(Axes):
             zo, _ = xywhere(z, lower, everymask)
             lo, uo = xywhere(lower, upper, everymask)
             barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
+            
+            if capsize > 0:
+
+                if lolims.any():
+                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(
+                        self.plot(xlo, yo, ls='None',
+                                  marker=mlines.CARETDOWN, zs=lowerlo, **plot_kw))
+                    lolims = ~lolims
+                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(self.plot(xlo, yo, 'k_', zs=lowerlo, **plot_kw))
+                else:
+                    xlo, lowerlo = xywhere(x, lower, everymask)
+                    caplines.extend(self.plot(xlo, yo, 'k_', zs=lowerlo, **plot_kw))
+
+                if uplims.any():
+                    xup, upperup = xywhere(x, upper, uplims & everymask)
+
+                    caplines.extend(
+                        self.plot(xup, yo, ls='None',
+                                  marker=mlines.CARETUP, zs=upperup, **plot_kw))
+                    uplims = ~uplims
+                    xup, upperup = xywhere(x, upper, uplims & everymask)
+                    caplines.extend(self.plot(xup, yo, 'k_', zs=upperup, **plot_kw))
+                else:
+                    xup, upperup = xywhere(x, upper, everymask)
+                    caplines.extend(self.plot(xup, yo, 'k_', zs=upperup, **plot_kw))
         else:
             zo, _ = xywhere(z, x, everymask)
                 
@@ -2830,33 +2868,33 @@ class Axes3D(Axes):
             barcols.append(self.vlines(xo, lo, uo, **lines_kw))
             if capsize > 0:
 
-                if lolims.any():
-                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                if ylolims.any():
+                    xlo, lowerlo = xywhere(x, lower, ylolims & everymask)
                     caplines.extend(
                         self.plot(xlo, lowerlo, ls='None',
                                   marker=mlines.CARETDOWN, zs=zo, **plot_kw))
-                    lolims = ~lolims
-                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    ylolims = ~ylolims
+                    xlo, lowerlo = xywhere(x, lower, ylolims & everymask)
                     caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zo, **plot_kw))
                 else:
                     xlo, lowerlo = xywhere(x, lower, everymask)
                     caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zo, **plot_kw))
 
-                if uplims.any():
-                    xup, upperup = xywhere(x, upper, uplims & everymask)
+                if yuplims.any():
+                    xup, upperup = xywhere(x, upper, yuplims & everymask)
 
                     caplines.extend(
                         self.plot(xup, upperup, ls='None',
                                   marker=mlines.CARETUP, zs=zo, **plot_kw))
-                    uplims = ~uplims
-                    xup, upperup = xywhere(x, upper, uplims & everymask)
+                    yuplims = ~yuplims
+                    xup, upperup = xywhere(x, upper, yuplims & everymask)
                     caplines.extend(self.plot(xup, upperup, 'k_', zs=zo, **plot_kw))
                 else:
                     xup, upperup = xywhere(x, upper, everymask)
                     caplines.extend(self.plot(xup, upperup, 'k_', zs=zo, **plot_kw))
                     
         if not barsabove and fmt is not None:
-            l0, = self.plot(x, y, fmt, **kwargs)
+            l0, = self.plot(x, y, fmt, zs=z, **kwargs)
 
         if ecolor is None:
             if l0 is None:
@@ -2879,8 +2917,6 @@ class Axes3D(Axes):
                                                has_yerr=(yerr is not None),
                                                label=label)
         self.containers.append(errorbar_container)
-        
-        # self.auto_scale_xyz(x, y, z, had_data)
 
         return errorbar_container  # (l0, caplines, barcols)
     
