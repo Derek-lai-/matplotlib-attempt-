@@ -2606,9 +2606,6 @@ class Axes3D(Axes):
 
         """
         
-        
-        had_data = self.has_data()
-
         if errorevery < 1:
             raise ValueError(
                 'errorevery has to be a strictly positive integer')
@@ -2743,100 +2740,9 @@ class Axes3D(Axes):
                 plot_kw['alpha'] = kwargs['alpha']
             if 'zorder' in kwargs:
                 plot_kw['zorder'] = kwargs['zorder']
-                
-        if xerr is not None:
-            if (iterable(xerr) and len(xerr) == 2 and
-                iterable(xerr[0]) and iterable(xerr[1])):
-                # using list comps rather than arrays to preserve units
-                left = [thisx - thiserr for (thisx, thiserr)
-                        in cbook.safezip(x, xerr[0])]
-                right = [thisx + thiserr for (thisx, thiserr)
-                         in cbook.safezip(x, xerr[1])]
-            else:
-                # using list comps rather than arrays to preserve units
-                left = [thisx - thiserr for (thisx, thiserr)
-                        in cbook.safezip(x, xerr)]
-                right = [thisx + thiserr for (thisx, thiserr)
-                         in cbook.safezip(x, xerr)]
-
-            yo, _ = xywhere(y, right, everymask)
-            lo, ro = xywhere(left, right, everymask)
-            barcols.append(self.hlines(yo, lo, ro, **lines_kw))
-            if capsize > 0:
-                if xlolims.any():
-                    # can't use numpy logical indexing since left and
-                    # y are lists
-                    leftlo, ylo = xywhere(left, y, xlolims & everymask)
-
-                    caplines.extend(
-                        self.plot(leftlo, ylo, ls='None',
-                                  marker=mlines.CARETLEFT, **plot_kw))
-                    xlolims = ~xlolims
-                    leftlo, ylo = xywhere(left, y, xlolims & everymask)
-                    caplines.extend(self.plot(leftlo, ylo, 'k|', **plot_kw))
-                else:
-
-                    leftlo, ylo = xywhere(left, y, everymask)
-                    caplines.extend(self.plot(leftlo, ylo, 'k|', **plot_kw))
-
-                if xuplims.any():
-
-                    rightup, yup = xywhere(right, y, xuplims & everymask)
-                    caplines.extend(
-                        self.plot(rightup, yup, ls='None',
-                                  marker=mlines.CARETRIGHT, **plot_kw))
-                    xuplims = ~xuplims
-                    rightup, yup = xywhere(right, y, xuplims & everymask)
-                    caplines.extend(self.plot(rightup, yup, 'k|', **plot_kw))
-                else:
-                    rightup, yup = xywhere(right, y, everymask)
-                    caplines.extend(self.plot(rightup, yup, 'k|', **plot_kw))
-
-        if yerr is not None:
-            if (iterable(yerr) and len(yerr) == 2 and
-                iterable(yerr[0]) and iterable(yerr[1])):
-                # using list comps rather than arrays to preserve units
-                lower = [thisy - thiserr for (thisy, thiserr)
-                         in cbook.safezip(y, yerr[0])]
-                upper = [thisy + thiserr for (thisy, thiserr)
-                         in cbook.safezip(y, yerr[1])]
-            else:
-                # using list comps rather than arrays to preserve units
-                lower = [thisy - thiserr for (thisy, thiserr)
-                         in cbook.safezip(y, yerr)]
-                upper = [thisy + thiserr for (thisy, thiserr)
-                         in cbook.safezip(y, yerr)]
-
-            xo, _ = xywhere(x, lower, everymask)
-            lo, uo = xywhere(lower, upper, everymask)
-            barcols.append(self.vlines(xo, lo, uo, **lines_kw))
-            if capsize > 0:
-
-                if lolims.any():
-                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
-                    caplines.extend(
-                        self.plot(xlo, lowerlo, ls='None',
-                                  marker=mlines.CARETDOWN, **plot_kw))
-                    lolims = ~lolims
-                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
-                    caplines.extend(self.plot(xlo, lowerlo, 'k_', **plot_kw))
-                else:
-                    xlo, lowerlo = xywhere(x, lower, everymask)
-                    caplines.extend(self.plot(xlo, lowerlo, 'k_', **plot_kw))
-
-                if uplims.any():
-                    xup, upperup = xywhere(x, upper, uplims & everymask)
-
-                    caplines.extend(
-                        self.plot(xup, upperup, ls='None',
-                                  marker=mlines.CARETUP, **plot_kw))
-                    uplims = ~uplims
-                    xup, upperup = xywhere(x, upper, uplims & everymask)
-                    caplines.extend(self.plot(xup, upperup, 'k_', **plot_kw))
-                else:
-                    xup, upperup = xywhere(x, upper, everymask)
-                    caplines.extend(self.plot(xup, upperup, 'k_', **plot_kw))
-                    
+        
+        xo, _ = xywhere(x, x, everymask)
+        yo, _ = xywhere(y, x, everymask)
         if zerr is not None:
             if (iterable(zerr) and len(zerr) == 2 and
                 iterable(zerr[0]) and iterable(zerr[1])):
@@ -2857,7 +2763,98 @@ class Axes3D(Axes):
             barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
         else:
             zo, _ = xywhere(z, x, everymask)
+                
+        if xerr is not None:
+            if (iterable(xerr) and len(xerr) == 2 and
+                iterable(xerr[0]) and iterable(xerr[1])):
+                # using list comps rather than arrays to preserve units
+                left = [thisx - thiserr for (thisx, thiserr)
+                        in cbook.safezip(x, xerr[0])]
+                right = [thisx + thiserr for (thisx, thiserr)
+                         in cbook.safezip(x, xerr[1])]
+            else:
+                # using list comps rather than arrays to preserve units
+                left = [thisx - thiserr for (thisx, thiserr)
+                        in cbook.safezip(x, xerr)]
+                right = [thisx + thiserr for (thisx, thiserr)
+                         in cbook.safezip(x, xerr)]
+            
+            lo, ro = xywhere(left, right, everymask)
+            barcols.append(self.hlines(yo, lo, ro, **lines_kw))
+            if capsize > 0:
+                if xlolims.any():
+                    # can't use numpy logical indexing since left and
+                    # y are lists
+                    leftlo, ylo = xywhere(left, y, xlolims & everymask)
 
+                    caplines.extend(
+                        self.plot(leftlo, ylo, ls='None',
+                                  marker=mlines.CARETLEFT, zs=zo, **plot_kw))
+                    xlolims = ~xlolims
+                    leftlo, ylo = xywhere(left, y, xlolims & everymask)
+                    caplines.extend(self.plot(leftlo, ylo, 'k|', zs=zo, **plot_kw))
+                else:
+
+                    leftlo, ylo = xywhere(left, y, everymask)
+                    caplines.extend(self.plot(leftlo, ylo, 'k|', zs=zo, **plot_kw))
+
+                if xuplims.any():
+
+                    rightup, yup = xywhere(right, y, xuplims & everymask)
+                    caplines.extend(
+                        self.plot(rightup, yup, ls='None',
+                                  marker=mlines.CARETRIGHT, zs=zo, **plot_kw))
+                    xuplims = ~xuplims
+                    rightup, yup = xywhere(right, y, xuplims & everymask)
+                    caplines.extend(self.plot(rightup, yup, 'k|', zs=zo, **plot_kw))
+                else:
+                    rightup, yup = xywhere(right, y, everymask)
+                    caplines.extend(self.plot(rightup, yup, 'k|', zs=zo, **plot_kw))
+
+        if yerr is not None:
+            if (iterable(yerr) and len(yerr) == 2 and
+                iterable(yerr[0]) and iterable(yerr[1])):
+                # using list comps rather than arrays to preserve units
+                lower = [thisy - thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr[0])]
+                upper = [thisy + thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr[1])]
+            else:
+                # using list comps rather than arrays to preserve units
+                lower = [thisy - thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr)]
+                upper = [thisy + thiserr for (thisy, thiserr)
+                         in cbook.safezip(y, yerr)]
+
+            lo, uo = xywhere(lower, upper, everymask)
+            barcols.append(self.vlines(xo, lo, uo, **lines_kw))
+            if capsize > 0:
+
+                if lolims.any():
+                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(
+                        self.plot(xlo, lowerlo, ls='None',
+                                  marker=mlines.CARETDOWN, zs=zo, **plot_kw))
+                    lolims = ~lolims
+                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zo, **plot_kw))
+                else:
+                    xlo, lowerlo = xywhere(x, lower, everymask)
+                    caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zo, **plot_kw))
+
+                if uplims.any():
+                    xup, upperup = xywhere(x, upper, uplims & everymask)
+
+                    caplines.extend(
+                        self.plot(xup, upperup, ls='None',
+                                  marker=mlines.CARETUP, zs=zo, **plot_kw))
+                    uplims = ~uplims
+                    xup, upperup = xywhere(x, upper, uplims & everymask)
+                    caplines.extend(self.plot(xup, upperup, 'k_', zs=zo, **plot_kw))
+                else:
+                    xup, upperup = xywhere(x, upper, everymask)
+                    caplines.extend(self.plot(xup, upperup, 'k_', zs=zo, **plot_kw))
+                    
         if not barsabove and fmt is not None:
             l0, = self.plot(x, y, fmt, **kwargs)
 
