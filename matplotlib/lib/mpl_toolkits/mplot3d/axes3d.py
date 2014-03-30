@@ -2688,31 +2688,37 @@ class Axes3D(Axes):
         if not iterable(lolims):
             lolims = np.asarray([lolims] * len(x), bool)
         else:
+            lolims = list(cbook.flatten(lolims))
             lolims = np.asarray(lolims, bool)
 
         if not iterable(uplims):
             uplims = np.array([uplims] * len(x), bool)
         else:
+            uplims = list(cbook.flatten(uplims))
             uplims = np.asarray(uplims, bool)
 
         if not iterable(xlolims):
             xlolims = np.array([xlolims] * len(x), bool)
         else:
+            xlolims = list(cbook.flatten(xlolims))
             xlolims = np.asarray(xlolims, bool)
 
         if not iterable(xuplims):
             xuplims = np.array([xuplims] * len(x), bool)
         else:
+            xuplims = list(cbook.flatten(xuplims))
             xuplims = np.asarray(xuplims, bool)
             
         if not iterable(ylolims):
             ylolims = np.array([ylolims] * len(x), bool)
         else:
+            ylolims = list(cbook.flatten(ylolims))
             ylolims = np.asarray(ylolims, bool)
 
         if not iterable(yuplims):
             yuplims = np.array([yuplims] * len(x), bool)
         else:
+            yuplims = list(cbook.flatten(yuplims))
             yuplims = np.asarray(yuplims, bool)
 
         everymask = np.arange(len(x)) % errorevery == 0
@@ -2752,8 +2758,8 @@ class Axes3D(Axes):
             if 'zorder' in kwargs:
                 plot_kw['zorder'] = kwargs['zorder']
         
-        xo, _ = xywhere(x, x, everymask)
-        yo, _ = xywhere(y, x, everymask)
+        xo, yo = xywhere(x, y, everymask)
+        zo, _ = xywhere(z, x, everymask)
         if zerr is not None:
             if (iterable(zerr) and len(zerr) == 2 and
                 iterable(zerr[0]) and iterable(zerr[1])):
@@ -2768,8 +2774,7 @@ class Axes3D(Axes):
                          in cbook.safezip(z, zerr)]
                 upper = [thisz + thiserr for (thisz, thiserr)
                          in cbook.safezip(z, zerr)]
-
-            zo, _ = xywhere(z, lower, everymask)
+            
             lo, uo = xywhere(lower, upper, everymask)
             barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
             
@@ -2785,7 +2790,6 @@ class Axes3D(Axes):
                     lolims = ~lolims
                     xlo, ylo = xywhere(x, y, lolims & everymask)
                     _, lowerlo = xywhere(x, lower, lolims & everymask)
-                    #if xlo:
                     caplines.extend(self.plot(xlo, ylo, 'k_', zs=lowerlo, **plot_kw))
                 else:
                     xlo, lowerlo = xywhere(x, lower, everymask)
@@ -2796,19 +2800,16 @@ class Axes3D(Axes):
                     _, upperup = xywhere(x, upper, uplims & everymask)
 
                     caplines.extend(
-                        self.plot(xup, yo, ls='None',
+                        self.plot(xup, yup, ls='None',
                                   marker=mlines.CARETUP, zs=upperup, **plot_kw))
                     uplims = ~uplims
                      
                     xup, yup = xywhere(x, y, uplims & everymask)
                     _, upperup = xywhere(x, upper, uplims & everymask)
-                    #if xup:
                     caplines.extend(self.plot(xup, yup, 'k_', zs=upperup, **plot_kw))
                 else:
                     xup, upperup = xywhere(x, upper, everymask)
                     caplines.extend(self.plot(xup, yo, 'k_', zs=upperup, **plot_kw))
-        else:
-            zo, _ = xywhere(z, x, everymask)
                 
         if xerr is not None:
             if (iterable(xerr) and len(xerr) == 2 and
@@ -2840,8 +2841,6 @@ class Axes3D(Axes):
                     xlolims = ~xlolims
                     leftlo, ylo = xywhere(left, y, xlolims & everymask)
                     _, zlo = xywhere(left, z, xlolims & everymask)
-                    
-                    #if leftlo:
                     caplines.extend(self.plot(leftlo, ylo, 'k|', zs=zlo, **plot_kw))
                 else:
 
@@ -2858,7 +2857,6 @@ class Axes3D(Axes):
                     xuplims = ~xuplims
                     rightup, yup = xywhere(right, y, xuplims & everymask)
                     _, zup = xywhere(right, z, xuplims & everymask)
-                    #if rightup:
                     caplines.extend(self.plot(rightup, yup, 'k|', zs=zup, **plot_kw))
                 else:
                     rightup, yup = xywhere(right, y, everymask)
@@ -2892,7 +2890,6 @@ class Axes3D(Axes):
                     ylolims = ~ylolims
                     xlo, lowerlo = xywhere(x, lower, ylolims & everymask)
                     _, zlo = xywhere(x, z, ylolims & everymask)
-                    #if xlo:
                     caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zlo, **plot_kw))
                 else:
                     xlo, lowerlo = xywhere(x, lower, everymask)
@@ -2908,7 +2905,6 @@ class Axes3D(Axes):
                     yuplims = ~yuplims
                     xup, upperup = xywhere(x, upper, yuplims & everymask)
                     _, zup = xywhere(x, z, yuplims & everymask)
-                    #if xup:
                     caplines.extend(self.plot(xup, upperup, 'k_', zs=zup, **plot_kw))
                 else:
                     xup, upperup = xywhere(x, upper, everymask)
