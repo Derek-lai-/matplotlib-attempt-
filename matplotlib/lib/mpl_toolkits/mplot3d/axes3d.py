@@ -2776,26 +2776,34 @@ class Axes3D(Axes):
             if capsize > 0:
 
                 if lolims.any():
-                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
+                    #import pydevd; pydevd.settrace()
+                    xlo, ylo = xywhere(x, y, lolims & everymask)
+                    _, lowerlo = xywhere(x, lower, lolims & everymask)
                     caplines.extend(
-                        self.plot(xlo, yo, ls='None',
+                        self.plot(xlo, ylo, ls='None',
                                   marker=mlines.CARETDOWN, zs=lowerlo, **plot_kw))
                     lolims = ~lolims
-                    xlo, lowerlo = xywhere(x, lower, lolims & everymask)
-                    caplines.extend(self.plot(xlo, yo, 'k_', zs=lowerlo, **plot_kw))
+                    xlo, ylo = xywhere(x, y, lolims & everymask)
+                    _, lowerlo = xywhere(x, lower, lolims & everymask)
+                    #if xlo:
+                    caplines.extend(self.plot(xlo, ylo, 'k_', zs=lowerlo, **plot_kw))
                 else:
                     xlo, lowerlo = xywhere(x, lower, everymask)
                     caplines.extend(self.plot(xlo, yo, 'k_', zs=lowerlo, **plot_kw))
 
                 if uplims.any():
-                    xup, upperup = xywhere(x, upper, uplims & everymask)
+                    xup, yup = xywhere(x, y, uplims & everymask)
+                    _, upperup = xywhere(x, upper, uplims & everymask)
 
                     caplines.extend(
                         self.plot(xup, yo, ls='None',
                                   marker=mlines.CARETUP, zs=upperup, **plot_kw))
                     uplims = ~uplims
-                    xup, upperup = xywhere(x, upper, uplims & everymask)
-                    caplines.extend(self.plot(xup, yo, 'k_', zs=upperup, **plot_kw))
+                     
+                    xup, yup = xywhere(x, y, uplims & everymask)
+                    _, upperup = xywhere(x, upper, uplims & everymask)
+                    #if xup:
+                    caplines.extend(self.plot(xup, yup, 'k_', zs=upperup, **plot_kw))
                 else:
                     xup, upperup = xywhere(x, upper, everymask)
                     caplines.extend(self.plot(xup, yo, 'k_', zs=upperup, **plot_kw))
@@ -2824,13 +2832,17 @@ class Axes3D(Axes):
                     # can't use numpy logical indexing since left and
                     # y are lists
                     leftlo, ylo = xywhere(left, y, xlolims & everymask)
+                    _, zlo = xywhere(left, z, xlolims & everymask)
 
                     caplines.extend(
                         self.plot(leftlo, ylo, ls='None',
-                                  marker=mlines.CARETLEFT, zs=zo, **plot_kw))
+                                  marker=mlines.CARETLEFT, zs=zlo, **plot_kw))
                     xlolims = ~xlolims
                     leftlo, ylo = xywhere(left, y, xlolims & everymask)
-                    caplines.extend(self.plot(leftlo, ylo, 'k|', zs=zo, **plot_kw))
+                    _, zlo = xywhere(left, z, xlolims & everymask)
+                    
+                    #if leftlo:
+                    caplines.extend(self.plot(leftlo, ylo, 'k|', zs=zlo, **plot_kw))
                 else:
 
                     leftlo, ylo = xywhere(left, y, everymask)
@@ -2839,12 +2851,15 @@ class Axes3D(Axes):
                 if xuplims.any():
 
                     rightup, yup = xywhere(right, y, xuplims & everymask)
+                    _, zup = xywhere(right, z, xuplims & everymask)
                     caplines.extend(
                         self.plot(rightup, yup, ls='None',
-                                  marker=mlines.CARETRIGHT, zs=zo, **plot_kw))
+                                  marker=mlines.CARETRIGHT, zs=zup, **plot_kw))
                     xuplims = ~xuplims
                     rightup, yup = xywhere(right, y, xuplims & everymask)
-                    caplines.extend(self.plot(rightup, yup, 'k|', zs=zo, **plot_kw))
+                    _, zup = xywhere(right, z, xuplims & everymask)
+                    #if rightup:
+                    caplines.extend(self.plot(rightup, yup, 'k|', zs=zup, **plot_kw))
                 else:
                     rightup, yup = xywhere(right, y, everymask)
                     caplines.extend(self.plot(rightup, yup, 'k|', zs=zo, **plot_kw))
@@ -2870,25 +2885,31 @@ class Axes3D(Axes):
 
                 if ylolims.any():
                     xlo, lowerlo = xywhere(x, lower, ylolims & everymask)
+                    _, zlo = xywhere(x, z, ylolims & everymask)
                     caplines.extend(
                         self.plot(xlo, lowerlo, ls='None',
-                                  marker=mlines.CARETDOWN, zs=zo, **plot_kw))
+                                  marker=mlines.CARETDOWN, zs=zlo, **plot_kw))
                     ylolims = ~ylolims
                     xlo, lowerlo = xywhere(x, lower, ylolims & everymask)
-                    caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zo, **plot_kw))
+                    _, zlo = xywhere(x, z, ylolims & everymask)
+                    #if xlo:
+                    caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zlo, **plot_kw))
                 else:
                     xlo, lowerlo = xywhere(x, lower, everymask)
                     caplines.extend(self.plot(xlo, lowerlo, 'k_', zs=zo, **plot_kw))
 
                 if yuplims.any():
                     xup, upperup = xywhere(x, upper, yuplims & everymask)
+                    _, zup = xywhere(x, z, yuplims & everymask)
 
                     caplines.extend(
                         self.plot(xup, upperup, ls='None',
-                                  marker=mlines.CARETUP, zs=zo, **plot_kw))
+                                  marker=mlines.CARETUP, zs=zup, **plot_kw))
                     yuplims = ~yuplims
                     xup, upperup = xywhere(x, upper, yuplims & everymask)
-                    caplines.extend(self.plot(xup, upperup, 'k_', zs=zo, **plot_kw))
+                    _, zup = xywhere(x, z, yuplims & everymask)
+                    #if xup:
+                    caplines.extend(self.plot(xup, upperup, 'k_', zs=zup, **plot_kw))
                 else:
                     xup, upperup = xywhere(x, upper, everymask)
                     caplines.extend(self.plot(xup, upperup, 'k_', zs=zo, **plot_kw))
