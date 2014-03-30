@@ -2777,9 +2777,7 @@ class Axes3D(Axes):
             
             lo, uo = xywhere(lower, upper, everymask)
             barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
-            
             if capsize > 0:
-
                 if lolims.any():
                     #import pydevd; pydevd.settrace()
                     xlo, ylo = xywhere(x, y, lolims & everymask)
@@ -2843,7 +2841,6 @@ class Axes3D(Axes):
                     _, zlo = xywhere(left, z, xlolims & everymask)
                     caplines.extend(self.plot(leftlo, ylo, 'k|', zs=zlo, **plot_kw))
                 else:
-
                     leftlo, ylo = xywhere(left, y, everymask)
                     caplines.extend(self.plot(leftlo, ylo, 'k|', zs=zo, **plot_kw))
 
@@ -2886,7 +2883,7 @@ class Axes3D(Axes):
                     _, zlo = xywhere(x, z, ylolims & everymask)
                     caplines.extend(
                         self.plot(xlo, lowerlo, ls='None',
-                                  marker=mlines.CARETDOWN, zs=zlo, **plot_kw))
+                                  marker=mlines.CARETLEFT, zs=zlo, **plot_kw))
                     ylolims = ~ylolims
                     xlo, lowerlo = xywhere(x, lower, ylolims & everymask)
                     _, zlo = xywhere(x, z, ylolims & everymask)
@@ -2901,7 +2898,7 @@ class Axes3D(Axes):
 
                     caplines.extend(
                         self.plot(xup, upperup, ls='None',
-                                  marker=mlines.CARETUP, zs=zup, **plot_kw))
+                                  marker=mlines.CARETRIGHT, zs=zup, **plot_kw))
                     yuplims = ~yuplims
                     xup, upperup = xywhere(x, upper, yuplims & everymask)
                     _, zup = xywhere(x, z, yuplims & everymask)
