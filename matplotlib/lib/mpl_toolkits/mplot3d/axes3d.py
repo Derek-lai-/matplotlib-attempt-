@@ -2624,7 +2624,7 @@ class Axes3D(Axes):
         if not iterable(x):
             x = [x]
         else:
-            # Ensure x is flattened in the case it is an N * 1 arraylike
+            # Ensure x is flattened in the case it is an N * N arraylike
             # otherwise hlines will raise an exception
             x = list(cbook.flatten(x))
 
@@ -2641,11 +2641,14 @@ class Axes3D(Axes):
         if xerr is not None:
             if not iterable(xerr):
                 xerr = [xerr] * len(x)
-            # Ensure xerr is flattened in the case it is an N * 1 arraylike
-            # Do not flatten if it is a 2 * N arraylike
+            # Ensure xerr is flattened in the case it is an N * N arraylike
             elif not(len(xerr) == 2 and iterable(xerr[0])
                      and iterable(xerr[1])):
                 xerr = list(cbook.flatten(xerr))
+            # Also flatten if it is a 2 * (N*N) arraylike
+            else:
+                xerr[0] = list(cbook.flatten(xerr[0]))
+                xerr[1] = list(cbook.flatten(xerr[1]))
 
         if yerr is not None:
             if not iterable(yerr):
@@ -2653,6 +2656,9 @@ class Axes3D(Axes):
             elif not (len(yerr) == 2 and iterable(yerr[0])
                       and iterable(yerr[1])):
                 yerr = list(cbook.flatten(yerr))
+            else:
+                yerr[0] = list(cbook.flatten(yerr[0]))
+                yerr[1] = list(cbook.flatten(yerr[1]))
                 
         if zerr is not None:
             if not iterable(zerr):
@@ -2660,6 +2666,9 @@ class Axes3D(Axes):
             elif not (len(zerr) == 2 and iterable(zerr[0])
                       and iterable(zerr[1])):
                 zerr = list(cbook.flatten(zerr))
+            else:
+                zerr[0] = list(cbook.flatten(zerr[0]))
+                zerr[1] = list(cbook.flatten(zerr[1]))
 
         l0 = None
 
@@ -2688,6 +2697,7 @@ class Axes3D(Axes):
         if not iterable(lolims):
             lolims = np.asarray([lolims] * len(x), bool)
         else:
+            # Could potentially use np.ma.ravel here instead
             lolims = list(cbook.flatten(lolims))
             lolims = np.asarray(lolims, bool)
 
