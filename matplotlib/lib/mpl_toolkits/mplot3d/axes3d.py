@@ -2490,18 +2490,6 @@ class Axes3D(Axes):
 
         return coll
     
-#     def zlines(self):
-#         lines = []
-#         lines += [list(zip(xl, yl, zl)) for xl, yl, zl in \
-#                   zip(txlines, tylines, tzlines)]
-# 
-#         linec = art3d.Line3DCollection(lines, *args, **kwargs)
-#         self.add_collection(linec)
-    
-    def errorbar2(self, x, y, z, zerr=None,
-                 **kwargs):
-        return Axes.errorbar(self, x, y, **kwargs)
-    
     def errorbar(self, x, y, z, zerr=None, yerr=None, xerr=None,
                  fmt='-', ecolor=None, elinewidth=None, capsize=3,
                  barsabove=False, lolims=False, uplims=False,
@@ -2789,7 +2777,6 @@ class Axes3D(Axes):
             barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
             if capsize > 0:
                 if lolims.any():
-                    #import pydevd; pydevd.settrace()
                     xlo, ylo = xywhere(x, y, lolims & everymask)
                     _, lowerlo = xywhere(x, lower, lolims & everymask)
                     caplines.extend(
