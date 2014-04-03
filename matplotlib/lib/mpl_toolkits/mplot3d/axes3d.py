@@ -2595,16 +2595,16 @@ class Axes3D(Axes):
 
         """
 
+        if errorevery < 1:
+            raise ValueError(
+                'errorevery has to be a strictly positive integer')
+
         x, y, z = art3d.juggle_axes(x, y, z, zdir)
         xerr, yerr, zerr = art3d.juggle_axes(xerr, yerr, zerr, zdir)
         xlolims, ylolims, lolims = art3d.juggle_axes(xlolims, ylolims, lolims, zdir)
         xuplims, yuplims, uplims = art3d.juggle_axes(xuplims, yuplims, uplims, zdir)
 
-        if errorevery < 1:
-            raise ValueError(
-                'errorevery has to be a strictly positive integer')
-
-        self._process_unit_info(xdata=x, ydata=y, kwargs=kwargs)
+        self._process_unit_info(xdata=x, ydata=y, zdata=z, kwargs=kwargs)
         if not self._hold:
             self.cla()
         holdstate = self._hold
@@ -2763,59 +2763,6 @@ class Axes3D(Axes):
 
         xo, yo = xywhere(x, y, everymask)
         zo, _ = xywhere(z, x, everymask)
-        if zerr is not None:
-            if (iterable(zerr) and len(zerr) == 2 and
-                iterable(zerr[0]) and iterable(zerr[1])):
-                # using list comps rather than arrays to preserve units
-                lower = [thisz - thiserr for (thisz, thiserr)
-                         in cbook.safezip(z, zerr[0])]
-                upper = [thisz + thiserr for (thisz, thiserr)
-                         in cbook.safezip(z, zerr[1])]
-            else:
-                # using list comps rather than arrays to preserve units
-                lower = [thisz - thiserr for (thisz, thiserr)
-                         in cbook.safezip(z, zerr)]
-                upper = [thisz + thiserr for (thisz, thiserr)
-                         in cbook.safezip(z, zerr)]
-
-            lo, uo = xywhere(lower, upper, everymask)
-            barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
-            if capsize > 0:
-                if lolims.any():
-                    xlo, ylo = xywhere(x, y, lolims & everymask)
-                    _, lowerlo = xywhere(x, lower, lolims & everymask)
-                    caplines.extend(
-                        self.plot(xlo, ylo, ls='None',
-                                  marker=mlines.CARETDOWN,
-                                  zs=lowerlo, **plot_kw))
-                    lolims = ~lolims
-                    xlo, ylo = xywhere(x, y, lolims & everymask)
-                    _, lowerlo = xywhere(x, lower, lolims & everymask)
-                    caplines.extend(self.plot(xlo, ylo, 'k_',
-                                              zs=lowerlo, **plot_kw))
-                else:
-                    xlo, lowerlo = xywhere(x, lower, everymask)
-                    caplines.extend(self.plot(xlo, yo, 'k_',
-                                              zs=lowerlo, **plot_kw))
-
-                if uplims.any():
-                    xup, yup = xywhere(x, y, uplims & everymask)
-                    _, upperup = xywhere(x, upper, uplims & everymask)
-
-                    caplines.extend(
-                        self.plot(xup, yup, ls='None',
-                                  marker=mlines.CARETUP,
-                                  zs=upperup, **plot_kw))
-                    uplims = ~uplims
-
-                    xup, yup = xywhere(x, y, uplims & everymask)
-                    _, upperup = xywhere(x, upper, uplims & everymask)
-                    caplines.extend(self.plot(xup, yup, 'k_',
-                                              zs=upperup, **plot_kw))
-                else:
-                    xup, upperup = xywhere(x, upper, everymask)
-                    caplines.extend(self.plot(xup, yo, 'k_',
-                                              zs=upperup, **plot_kw))
 
         if xerr is not None:
             if (iterable(xerr) and len(xerr) == 2 and
@@ -2926,6 +2873,60 @@ class Axes3D(Axes):
                     xup, upperup = xywhere(x, upper, everymask)
                     caplines.extend(self.plot(xup, upperup, 'k_',
                                               zs=zo, **plot_kw))
+
+        if zerr is not None:
+            if (iterable(zerr) and len(zerr) == 2 and
+                iterable(zerr[0]) and iterable(zerr[1])):
+                # using list comps rather than arrays to preserve units
+                lower = [thisz - thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr[0])]
+                upper = [thisz + thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr[1])]
+            else:
+                # using list comps rather than arrays to preserve units
+                lower = [thisz - thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr)]
+                upper = [thisz + thiserr for (thisz, thiserr)
+                         in cbook.safezip(z, zerr)]
+
+            lo, uo = xywhere(lower, upper, everymask)
+            barcols.append(self.zlines(xo, yo, lo, uo, **lines_kw))
+            if capsize > 0:
+                if lolims.any():
+                    xlo, ylo = xywhere(x, y, lolims & everymask)
+                    _, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(
+                        self.plot(xlo, ylo, ls='None',
+                                  marker=mlines.CARETDOWN,
+                                  zs=lowerlo, **plot_kw))
+                    lolims = ~lolims
+                    xlo, ylo = xywhere(x, y, lolims & everymask)
+                    _, lowerlo = xywhere(x, lower, lolims & everymask)
+                    caplines.extend(self.plot(xlo, ylo, 'k_',
+                                              zs=lowerlo, **plot_kw))
+                else:
+                    xlo, lowerlo = xywhere(x, lower, everymask)
+                    caplines.extend(self.plot(xlo, yo, 'k_',
+                                              zs=lowerlo, **plot_kw))
+
+                if uplims.any():
+                    xup, yup = xywhere(x, y, uplims & everymask)
+                    _, upperup = xywhere(x, upper, uplims & everymask)
+
+                    caplines.extend(
+                        self.plot(xup, yup, ls='None',
+                                  marker=mlines.CARETUP,
+                                  zs=upperup, **plot_kw))
+                    uplims = ~uplims
+
+                    xup, yup = xywhere(x, y, uplims & everymask)
+                    _, upperup = xywhere(x, upper, uplims & everymask)
+                    caplines.extend(self.plot(xup, yup, 'k_',
+                                              zs=upperup, **plot_kw))
+                else:
+                    xup, upperup = xywhere(x, upper, everymask)
+                    caplines.extend(self.plot(xup, yo, 'k_',
+                                              zs=upperup, **plot_kw))
 
         if not barsabove and fmt is not None:
             l0, = self.plot(x, y, fmt, zs=z, **kwargs)
