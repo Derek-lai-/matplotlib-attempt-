@@ -204,6 +204,17 @@ def test_iter_lolims():
     yerr = 0.25
     zerr = 0.5
 
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      lolims=False)
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 def test_iter_uplims():
     X = [1, 2, 3]
@@ -213,6 +224,18 @@ def test_iter_uplims():
     xerr = 0.3
     yerr = 0.25
     zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      uplims=False)
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 
 def test_iter_xlolims():
@@ -224,6 +247,17 @@ def test_iter_xlolims():
     yerr = 0.25
     zerr = 0.5
 
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      xlolims=False)
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 def test_iter_xuplims():
     X = [1, 2, 3]
@@ -234,6 +268,17 @@ def test_iter_xuplims():
     yerr = 0.25
     zerr = 0.5
 
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      xuplims=False)
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 def test_capsize():
     X = [1, 2, 3]
