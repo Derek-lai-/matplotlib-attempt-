@@ -2365,7 +2365,7 @@ class Axes3D(Axes):
         if len(x) != len(y) or len(x) != len(z):
             warnings.warn('x, y, and z must be the same length.')
 
-        # Because xerr and yerr will be passed to errorbar,
+        # Because xerr, yerr and zerr will be passed to errorbar,
         # most dimension checking and processing will be left
         # to the errorbar method.
         xerr = kwargs.pop('xerr', None)
