@@ -2344,6 +2344,18 @@ class Axes3D(Axes):
         if len(x) != len(y) or len(x) != len(z):
             warnings.warn('x, y, and z must be the same length.')
 
+        # Because xerr and yerr will be passed to errorbar,
+        # most dimension checking and processing will be left
+        # to the errorbar method.
+        xerr = kwargs.pop('xerr', None)
+        yerr = kwargs.pop('yerr', None)
+        zerr = kwargs.pop('zerr', None)
+        error_kw = kwargs.pop('error_kw', dict())
+        ecolor = kwargs.pop('ecolor', None)
+        capsize = kwargs.pop('capsize', 3)
+        error_kw.setdefault('ecolor', ecolor)
+        error_kw.setdefault('capsize', capsize)
+
         # FIXME: This is archaic and could be done much better.
         minx, miny, minz = 1e20, 1e20, 1e20
         maxx, maxy, maxz = -1e20, -1e20, -1e20
@@ -2388,6 +2400,21 @@ class Axes3D(Axes):
             if len(facecolors) < len(x):
                 facecolors *= (6 * len(x))
 
+        if xerr is not None or yerr is not None or zerr is not None:
+            xs = [l + 0.5 * w for l, w in zip(x, dx)]
+            ys = [b + 0.5 * h for b, h in zip(y, dy)]
+            import operator
+            zs = map(operator.add, z, dz)
+
+            if "label" not in error_kw:
+                error_kw["label"] = '_nolegend_'
+
+            errorbar = self.errorbar(xs, ys, zs,
+                                     yerr=yerr, xerr=xerr, zerr=zerr,
+                                     fmt=None, **error_kw)
+        else:
+            errorbar = None
+
         normals = self._generate_normals(polys)
         sfacecolors = self._shade_colors(facecolors, normals)
         col = art3d.Poly3DCollection(polys,
@@ -2397,6 +2424,7 @@ class Axes3D(Axes):
         self.add_collection(col)
 
         self.auto_scale_xyz((minx, maxx), (miny, maxy), (minz, maxz), had_data)
+
 
     def zlines(self, x, y, zmin, zmax, colors='k', linestyles='solid',
                label='', **kwargs):
