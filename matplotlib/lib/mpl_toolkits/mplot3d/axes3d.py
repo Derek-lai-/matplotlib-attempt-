@@ -2315,6 +2315,27 @@ class Axes3D(Axes):
           5. -X
           6. +X
 
+        Parameters for errorbars
+        ------------------------
+        xerr : scalar or array-like, optional, default: None
+            if not None, will be used to generate errorbar(s) on the bar chart
+
+        yerr : scalar or array-like, optional, default: None
+            if not None, will be used to generate errorbar(s) on the bar chart
+
+        zerr : scalar or array-like, optional, default: None
+            if not None, will be used to generate errorbar(s) on the bar chart
+
+        ecolor : scalar or array-like, optional, default: None
+            specifies the color of errorbar(s)
+
+        capsize : integer, optional, default: 3
+           determines the length in points of the error bar caps
+
+        error_kw :
+            dictionary of kwargs to be passed to errorbar method. *ecolor* and
+            *capsize* may be specified here rather than as independent kwargs.
+
         Keyword arguments are passed onto
         :func:`~mpl_toolkits.mplot3d.art3d.Poly3DCollection`
         '''
