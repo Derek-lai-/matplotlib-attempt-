@@ -61,3 +61,8 @@ examples/tests/*
 !examples/tests/backend_driver.py
 texput.log
 result_images
+
+# Coverage generated files #
+############################
+.coverage
+cover/

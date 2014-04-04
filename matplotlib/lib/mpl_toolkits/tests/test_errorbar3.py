@@ -36,9 +36,12 @@ def assert_errors_equal(x,y,z,xerr,yerr,zerr,err):
 			assert(all(line[0] == [x[i], y[i], z[i]-zerr[i]]))
 			assert(all(line[1] == [x[i], y[i], z[i]+zerr[i]]))
 
-def test_errorbar_zerr_none():
+def setup():
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
+
+def test_errorbar_zerr_none():
+	setup()
 
 	xs = np.arange(20)
 	ys = np.arange(20)
@@ -50,6 +53,18 @@ def test_errorbar_zerr_none():
 	err = ax.errorbar(xs,ys,zs,xerr=xerr,yerr=yerr,zerr=zerr,errorevery=1)
 	assert_errors_equal(xs,ys,zs,xerr,yerr,zerr,err)
 
+def test_errorbar_zerr_notnone():
+	setup()
+
+	xs = np.arange(20)
+	ys = np.arange(20)
+	zs = np.arange(20)
+	zerr = None
+	xerr = 1
+	yerr = 1
+	
+	err = ax.errorbar(xs,ys,zs,xerr=xerr,yerr=yerr,zerr=zerr,errorevery=1)
+	assert_errors_equal(xs,ys,zs,xerr,yerr,zerr,err)
 '''
 if zerr is not none
 	if iterable(zerr) and len(zerr) = 2 and iterable(zerr[0]) and iterable(zerr[1])
