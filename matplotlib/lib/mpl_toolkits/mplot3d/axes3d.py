@@ -2429,10 +2429,13 @@ class Axes3D(Axes):
     def zlines(self, x, y, zmin, zmax, colors='k', linestyles='solid',
                label='', **kwargs):
         """
-        Plot horizontal lines at each `y` from `zmin` to `zmax`.
+        Plot lines on the z axis at each `x`,`y` from `zmin` to `zmax`.
+        Similar to 2D Axes.hlines and Axes.vlines methods.
 
         Parameters
         ----------
+        x : scalar or sequence of scalar
+            x-indexes where to plot the lines.
         y : scalar or sequence of scalar
             y-indexes where to plot the lines.
 
@@ -2448,26 +2451,24 @@ class Axes3D(Axes):
 
         Returns
         -------
-        lines : `~matplotlib.collections.LineCollection`
+        lines : `~matplotlib.collections.Line3DCollection`
 
         Other parameters
         ----------------
-        kwargs :  `~matplotlib.collections.LineCollection` properties.
+        kwargs :  `~matplotlib.collections.Line3DCollection` properties.
 
         See also
         --------
-        vlines : vertical lines
 
-        Examples
-        --------
-        .. plot:: mpl_examples/pylab_examples/vline_hline_demo.py
+        :func:`~matplotlib.axes.Axes.xlines` : horizontal lines
+        :func:`~matplotlib.axes.Axes.vlines` : vertical lines
 
         """
 
         # We do the conversion first since not all unitized data is uniform
         # process the unit information
         self._process_unit_info(x, y, [zmin, zmax], kwargs=kwargs)
-        x = self.convert_yunits(x)
+        x = self.convert_xunits(x)
         y = self.convert_yunits(y)
         zmin = self.convert_zunits(zmin)
         zmax = self.convert_zunits(zmax)
@@ -2525,101 +2526,43 @@ class Axes3D(Axes):
                  errorevery=1, capthick=None,
                  **kwargs):
         """
-        Plot an errorbar graph.
+        Plot a 3d errorbar graph.
+        Similar in behaviour to 2d errorbar method in Axes.
 
         Call signature::
 
-          errorbar(x, y, yerr=None, xerr=None,
-                   fmt='-', ecolor=None, elinewidth=None, capsize=3,
-                   barsabove=False, lolims=False, uplims=False,
-                   xlolims=False, xuplims=False, errorevery=1,
-                   capthick=None)
+          errorbar(x, y, z, zdir='z', zerr=None, yerr=None, xerr=None,
+                 fmt='-', ecolor=None, elinewidth=None, capsize=3,
+                 barsabove=False, lolims=False, uplims=False,
+                 xlolims=False, xuplims=False, ylolims=False, yuplims=False,
+                 errorevery=1, capthick=None,)
 
-        Plot *x* versus *y* with error deltas in *yerr* and *xerr*.
-        Vertical errorbars are plotted if *yerr* is not *None*.
-        Horizontal errorbars are plotted if *xerr* is not *None*.
+        Plot *x*, *y* vs *z* with error deltas in *zerr*, *yerr* and *xerr*.
 
-        *x*, *y*, *xerr*, and *yerr* can all be scalars, which plots a
-        single error bar at *x*, *y*.
+        *x*, *y*, *z* *xerr*, *yerr*, and *zerr* can all be scalars,
+        which plots a single error bar at *x*, *y*, *z*.
 
         Optional keyword arguments:
 
-          *xerr*/*yerr*: [ scalar | N, Nx1, or 2xN array-like ]
-            If a scalar number, len(N) array-like object, or an Nx1
-            array-like object, errorbars are drawn at +/-value relative
-            to the data.
-
-            If a sequence of shape 2xN, errorbars are drawn at -row1
-            and +row2 relative to the data.
-
-          *fmt*: '-'
-            The plot format symbol. If *fmt* is *None*, only the
-            errorbars are plotted.  This is used for adding
-            errorbars to a bar plot, for example.
-
-          *ecolor*: [ *None* | mpl color ]
-            A matplotlib color arg which gives the color the errorbar lines;
-            if *None*, use the marker color.
-
-          *elinewidth*: scalar
-            The linewidth of the errorbar lines. If *None*, use the linewidth.
-
-          *capsize*: scalar
-            The length of the error bar caps in points
-
-          *capthick*: scalar
-            An alias kwarg to *markeredgewidth* (a.k.a. - *mew*). This
-            setting is a more sensible name for the property that
-            controls the thickness of the error bar cap in points. For
-            backwards compatibility, if *mew* or *markeredgewidth* are given,
-            then they will over-ride *capthick*.  This may change in future
-            releases.
-
-          *barsabove*: [ *True* | *False* ]
-            if *True*, will plot the errorbars above the plot
-            symbols. Default is below.
-
-          *lolims* / *uplims* / *xlolims* / *xuplims*: [ *False* | *True* ]
-            These arguments can be used to indicate that a value gives
-            only upper/lower limits. In that case a caret symbol is
-            used to indicate this. lims-arguments may be of the same
-            type as *xerr* and *yerr*.
-
-          *errorevery*: positive integer
-            subsamples the errorbars. e.g., if everyerror=5, errorbars for
-            every 5-th datapoint will be plotted. The data plot itself still
-            shows all data points.
-
-        All other keyword arguments are passed on to the plot command for the
-        markers. For example, this code makes big red squares with
-        thick green edges::
-
-          x,y,yerr = rand(3,10)
-          errorbar(x, y, yerr, marker='s',
-                   mfc='red', mec='green', ms=20, mew=4)
-
-        where *mfc*, *mec*, *ms* and *mew* are aliases for the longer
-        property names, *markerfacecolor*, *markeredgecolor*, *markersize*
-        and *markeredgewith*.
-
-        valid kwargs for the marker properties are
-
-        %(Line2D)s
+          See
+          :func:`~matplotlib.axes.Axes.errorbar`
+          for description of keyword arguments
 
         Returns (*plotline*, *caplines*, *barlinecols*):
 
-            *plotline*: :class:`~matplotlib.lines.Line2D` instance
-                *x*, *y* plot markers and/or line
+            *plotline*: :class:`~matplotlib.lines.Line3D` instance
+                *x*, *y*, *z* plot markers and/or line
 
             *caplines*: list of error bar cap
-                :class:`~matplotlib.lines.Line2D` instances
+                :class:`~mpl_toolkits.mplot3d.art3d.Line3D` instances
             *barlinecols*: list of
-                :class:`~matplotlib.collections.LineCollection` instances for
-                the horizontal and vertical error ranges.
+                :class:`~mpl_toolkits.mplot3d.art3d.Line3DCollection`
+                 instances for the x,y, and z error ranges.
 
-        **Example:**
+        See also
+        --------
 
-        .. plot:: mpl_examples/statistics/errorbar_demo.py
+        :func:`~matplotlib.axes.Axes.errorbar` : 2d errorbars
 
         """
 
@@ -2967,6 +2910,7 @@ class Axes3D(Axes):
 
         for l in barcols:
             l.set_color(ecolor)
+            # Convert xerr and yerr 2d LineCollections to 3d
             self.add_collection3d(l, zs=zo)
         for l in caplines:
             l.set_color(ecolor)
