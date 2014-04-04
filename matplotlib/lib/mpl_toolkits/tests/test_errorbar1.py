@@ -40,11 +40,11 @@ def assert_errors_equal(x,y,z,xerr,yerr,zerr,err):
 			assert(all(line[0] == [x[i], y[i], z[i]-zerr[i]]))
 			assert(all(line[1] == [x[i], y[i], z[i]+zerr[i]]))
 
-@raise(ValueError)
+@raises(ValueError)
 def test_errorbar2_errorevery1():
     """Errorevery = -2 """
-    setup()
-    xs = np.arange(20)
+	setup()
+	xs = np.arange(20)
 	ys = np.arange(20)
 	zs = np.arange(20)
 	zerr = 1
@@ -52,7 +52,7 @@ def test_errorbar2_errorevery1():
 	yerr = 1
 	errorevery = -2
 
-    err = ax.errorbar(xs, ys, zs, xerr=xerr, yerr=yerr, zerr=zerr, errorevery=errorevery)
+	err = ax.errorbar(xs, ys, zs, xerr=xerr, yerr=yerr, zerr=zerr, errorevery=errorevery)
     assert_errors_equal(xs,ys,zs,xerr,yerr,zerr,err)
     
 def test_errorbar2_errorevery2():
