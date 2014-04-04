@@ -38,9 +38,7 @@ def assert_capline_value(err, value):
             assert(list(vert) == val)
         print '],'
         i += 1
-
-
-    print '---'
+    print '-----'
 
 def assert_barline_value(err, value):
     for errorbarCont, i in zip(err[2], xrange(2)):
@@ -95,6 +93,19 @@ def test_linewidth():
     yerr = 0.25
     zerr = 0.5
 
+    # elinewidth=None, linewidth = 1 in kwargs
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      kwargs = 'linewidth=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
+    #print_value(err, 'linewidth');
 
 def test_lw():
     X = [1, 2, 3]
@@ -105,6 +116,18 @@ def test_lw():
     yerr = 0.25
     zerr = 0.5
 
+    # elinewidth=None, lw=0 in kwargs
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      kwargs = 'lw=0')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 def test_transform():
     X = [1, 2, 3]
@@ -114,6 +137,18 @@ def test_transform():
     xerr = 0.3
     yerr = 0.25
     zerr = 0.5
+    # elinewidth=None, transform=1 in kwargs
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      kwargs = 'transform=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 
 def test_alpha():
@@ -125,6 +160,18 @@ def test_alpha():
     yerr = 0.25
     zerr = 0.5
 
+    # elinewidth=None, alpha=1 in kwargs
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      kwargs = 'alpha=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 def test_zorder():
     X = [1, 2, 3]
@@ -135,6 +182,18 @@ def test_zorder():
     yerr = 0.25
     zerr = 0.5
 
+    # elinewidth=None, zorder=1 in kwargs
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      kwargs = 'zorder=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_capline_value(err, value);
 
 def test_iter_lolims():
     X = [1, 2, 3]
@@ -195,8 +254,14 @@ def test_capsize():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_capline_value(err, value)
 
+    # capsize = 0
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      capsize = 0)
+    value = []
+    assert_capline_value(err, value)
+    
 def test_errorbar2():
     test_elinewidth()
     test_linewidth()
