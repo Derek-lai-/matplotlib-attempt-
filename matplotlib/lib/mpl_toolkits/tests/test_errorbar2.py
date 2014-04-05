@@ -313,6 +313,50 @@ def test_iter_xlolims():
          ]
     assert_errbar_value(err, value);
 
+def test_iter_ylolims():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      ylolims=False)
+
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
+def test_iter_yuplims():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      yuplims=False)
+
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
 def test_iter_xuplims():
     X = [1, 2, 3]
     Y = [2, 1, 1]
@@ -525,6 +569,8 @@ def test_errorbar2():
     test_transform2()
     test_alpha2()
     test_zorder2()
+    test_iter_ylolims()
+    test_iter_yuplims()
 
 
 
