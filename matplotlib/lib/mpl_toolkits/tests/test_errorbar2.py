@@ -23,7 +23,7 @@ def print_value(err, header):
         i += 1
 
 
-def assert_capline_value(err, value):
+def assert_errbar_value(err, value):
     #plotted = err[0]
     #caplines = err[1]
     #errorbarContainers = err[2]
@@ -68,7 +68,7 @@ def test_elinewidth(linewidth=None):
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
     print_value(err, 'elinewidth = None')
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
     # elinewidth != None
     err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
@@ -82,7 +82,7 @@ def test_elinewidth(linewidth=None):
         [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
         [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
         ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 def test_linewidth():
     X = [1, 2, 3]
@@ -104,7 +104,7 @@ def test_linewidth():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
     #print_value(err, 'linewidth');
 
 def test_lw():
@@ -127,7 +127,7 @@ def test_lw():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 def test_transform():
     X = [1, 2, 3]
@@ -148,7 +148,7 @@ def test_transform():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 
 def test_alpha():
@@ -171,7 +171,7 @@ def test_alpha():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 def test_zorder():
     X = [1, 2, 3]
@@ -193,7 +193,7 @@ def test_zorder():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 def test_iter_lolims():
     X = [1, 2, 3]
@@ -214,7 +214,7 @@ def test_iter_lolims():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 def test_iter_uplims():
     X = [1, 2, 3]
@@ -235,7 +235,7 @@ def test_iter_uplims():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 
 def test_iter_xlolims():
@@ -257,7 +257,7 @@ def test_iter_xlolims():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 def test_iter_xuplims():
     X = [1, 2, 3]
@@ -278,7 +278,7 @@ def test_iter_xuplims():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value);
+    assert_errbar_value(err, value);
 
 def test_capsize():
     X = [1, 2, 3]
@@ -299,14 +299,141 @@ def test_capsize():
                 [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
                 [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
          ]
-    assert_capline_value(err, value)
+    assert_errbar_value(err, value)
 
     # capsize = 0
     err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
                       capsize = 0)
     value = []
-    assert_capline_value(err, value)
+    assert_errbar_value(err, value)
     
+def test_capthick():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      capthick=1)
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
+def test_markeredgewidth():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      kwargs='markeredgewidth=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
+def test_mew():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      capthick=None, kwargs='mew=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
+def test_transform2():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      capthick=None, kwargs='transform=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
+def test_alpha2():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      capthick=None, kwargs='alpha=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
+def test_zorder2():
+    X = [1, 2, 3]
+    Y = [2, 1, 1]
+    Z = [3, 4, 5]
+
+    xerr = 0.3
+    yerr = 0.25
+    zerr = 0.5
+
+    err = ax.errorbar(X, Y, Z, xerr=xerr, yerr=yerr, zerr=zerr, fmt=None,
+                      capthick=None, kwargs='zorder=1')
+    value = [
+                [ [0.7, 1.7, 2.7], [2, 1, 1], [3, 4, 5], ],
+                [ [1.3, 2.3, 3.3], [2, 1, 1], [3, 4, 5] ],
+                [ [1, 2, 3], [1.75, 0.75, 0.75], [3, 4, 5] ],
+                [ [1, 2, 3], [2.25, 1.25, 1.25], [3, 4, 5] ],
+                [ [1, 2, 3], [2, 1, 1], [2.5, 3.5, 4.5] ],
+                [ [1, 2, 3], [2, 1, 1], [3.5, 4.5, 5.5] ],
+         ]
+    assert_errbar_value(err, value);
+
+
 def test_errorbar2():
     test_elinewidth()
     test_linewidth()
@@ -319,7 +446,13 @@ def test_errorbar2():
     test_iter_xlolims()
     test_iter_xuplims()
     test_capsize()
-        
+    test_capthick()
+    test_markeredgewidth()
+    test_mew()
+    test_transform2()
+    test_alpha2()
+    test_zorder2()
+
 
 
 if __name__ == '__main__':
