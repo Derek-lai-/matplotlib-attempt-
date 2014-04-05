@@ -31,6 +31,7 @@ import numpy as np
 from matplotlib.colors import Normalize, colorConverter, LightSource
 from matplotlib.container import ErrorbarContainer
 import matplotlib.lines as mlines
+
 iterable = cbook.iterable
 
 from . import art3d
@@ -2446,7 +2447,6 @@ class Axes3D(Axes):
 
         self.auto_scale_xyz((minx, maxx), (miny, maxy), (minz, maxz), had_data)
 
-
     def zlines(self, x, y, zmin, zmax, colors='k', linestyles='solid',
                label='', **kwargs):
         """
@@ -2521,7 +2521,7 @@ class Axes3D(Axes):
         verts = [((thisx, thisy, thiszmin), (thisx, thisy, thiszmax))
                  for thisx, thisy, thiszmin, thiszmax in zip(x, y, zmin, zmax)]
         coll = art3d.Line3DCollection(verts, colors=colors,
-                                    linestyles=linestyles, label=label)
+                                      linestyles=linestyles, label=label)
         self.add_collection(coll)
         coll.update(kwargs)
 
@@ -2543,7 +2543,7 @@ class Axes3D(Axes):
     def errorbar(self, x, y, z, zdir='z', zerr=None, yerr=None, xerr=None,
                  fmt='-', ecolor=None, elinewidth=None, capsize=3,
                  barsabove=False, lolims=False, uplims=False,
-                 xlolims=False, xuplims=False, ylolims=False, yuplims=False, 
+                 xlolims=False, xuplims=False, ylolims=False, yuplims=False,
                  errorevery=1, capthick=None,
                  **kwargs):
         """
@@ -2593,8 +2593,10 @@ class Axes3D(Axes):
 
         x, y, z = art3d.juggle_axes(x, y, z, zdir)
         xerr, yerr, zerr = art3d.juggle_axes(xerr, yerr, zerr, zdir)
-        xlolims, ylolims, lolims = art3d.juggle_axes(xlolims, ylolims, lolims, zdir)
-        xuplims, yuplims, uplims = art3d.juggle_axes(xuplims, yuplims, uplims, zdir)
+        xlolims, ylolims, lolims = art3d.juggle_axes(xlolims, ylolims, lolims,
+                                                     zdir)
+        xuplims, yuplims, uplims = art3d.juggle_axes(xuplims, yuplims, uplims,
+                                                     zdir)
 
         self._process_unit_info(xdata=x, ydata=y, zdata=z, kwargs=kwargs)
         if not self._hold:
@@ -2788,11 +2790,11 @@ class Axes3D(Axes):
                     leftlo, ylo = xywhere(left, y, xlolims & everymask)
                     _, zlo = xywhere(left, z, xlolims & everymask)
                     caplines.extend(self.plot(leftlo, ylo, 'k|',
-                                               zs=zlo, **plot_kw))
+                                              zs=zlo, **plot_kw))
                 else:
                     leftlo, ylo = xywhere(left, y, everymask)
                     caplines.extend(self.plot(leftlo, ylo, 'k|',
-                                               zs=zo, **plot_kw))
+                                              zs=zo, **plot_kw))
 
                 if xuplims.any():
 
@@ -2806,11 +2808,11 @@ class Axes3D(Axes):
                     rightup, yup = xywhere(right, y, xuplims & everymask)
                     _, zup = xywhere(right, z, xuplims & everymask)
                     caplines.extend(self.plot(rightup, yup, 'k|',
-                                               zs=zup, **plot_kw))
+                                              zs=zup, **plot_kw))
                 else:
                     rightup, yup = xywhere(right, y, everymask)
                     caplines.extend(self.plot(rightup, yup, 'k|',
-                                               zs=zo, **plot_kw))
+                                              zs=zo, **plot_kw))
 
         if yerr is not None:
             if (iterable(yerr) and len(yerr) == 2 and
@@ -2954,6 +2956,7 @@ class Axes3D(Axes):
         self.title.set_y(0.92 * y)
         return ret
     set_title.__doc__ = maxes.Axes.set_title.__doc__
+
 
 def get_test_data(delta=0.05):
     '''
